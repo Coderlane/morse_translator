@@ -4,6 +4,11 @@
 
 #include <morse_tree.h>
 
+/**
+ * @brief 
+ *
+ * @return 
+ */
 struct morse_tree_t* 
 morse_tree_new()
 {
@@ -13,11 +18,37 @@ morse_tree_new()
 	return mt;
 }
 
+/**
+ * @brief 
+ *
+ * @param mt_ptr
+ */
 void 
-morse_tree_load(struct morse_tree_t* mt, char* filename)
+morse_tree_delete(struct morse_tree_t** mt_ptr)
+{
+	struct morse_tree_t* mt;
+	assert(mt_ptr != NULL);
+
+	mt = *mt_ptr;
+	if(mt == NULL)
+		return;
+
+	morse_tree_node_delete(&(mt->mt_dah));
+	morse_tree_node_delete(&(mt->mt_dit));
+}
+
+/**
+ * @brief 
+ *
+ * @param mt
+ * @param filename
+ */
+void 
+morse_tree_load(struct morse_tree_t* mt, const char* filename)
 {
 	char *line = NULL;
-	int len = 0, read;
+	size_t len = 0;
+	ssize_t read;
 	FILE *file;
 	
 	assert(filename != NULL);
@@ -29,11 +60,19 @@ morse_tree_load(struct morse_tree_t* mt, char* filename)
 	}
 	if(line != NULL) 
 		free(line);
+
 	fclose(file);
 }
 
+/**
+ * @brief 
+ *
+ * @param mt
+ * @param c
+ * @param morse
+ */
 void 
-morse_tree_insert(struct morse_tree_t *mt, char c, char* morse)
+morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 {
 	int len = strlen(morse);
 	printf("%c:%s\n", c, morse);
@@ -76,8 +115,16 @@ morse_tree_insert(struct morse_tree_t *mt, char c, char* morse)
 	}
 }
 
+/**
+ * @brief 
+ *
+ * @param mt
+ * @param morse
+ *
+ * @return 
+ */
 char 
-morse_tree_get(struct morse_tree_t *mt, char *morse)
+morse_tree_get(struct morse_tree_t* mt, const char* morse)
 {
 	int len = strlen(morse);
 
@@ -114,6 +161,11 @@ morse_tree_get(struct morse_tree_t *mt, char *morse)
 	}
 }
 
+/**
+ * @brief 
+ *
+ * @return 
+ */
 struct morse_tree_node_t* 
 morse_tree_node_new()
 {
@@ -121,4 +173,31 @@ morse_tree_node_new()
 	return mtn;			
 }
 
+/**
+ * @brief 
+ *
+ * @param mtn_ptr
+ */
+void
+morse_tree_node_delete(struct morse_tree_node_t** mtn_ptr)
+{
+	struct morse_tree_node_t* mtn;
+	assert(mtn_ptr != NULL);
 
+	mtn = *mtn_ptr;
+	if(mtn == NULL)
+		return;
+
+	// Recurse down dah.
+	if(mtn->mtn_dah != NULL) {
+		morse_tree_node_delete(&(mtn->mtn_dah));
+	}
+
+	// Recurse down dit.
+	if(mtn->mtn_dit != NULL) {
+		morse_tree_node_delete(&(mtn->mtn_dit));
+	}
+
+	free(mtn);
+	*mtn_ptr = NULL;
+}

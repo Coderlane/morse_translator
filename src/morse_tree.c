@@ -35,6 +35,9 @@ morse_tree_delete(struct morse_tree_t** mt_ptr)
 
 	morse_tree_node_delete(&(mt->mt_dah));
 	morse_tree_node_delete(&(mt->mt_dit));
+
+	free(mt);
+	*mt_ptr = NULL;
 }
 
 /**

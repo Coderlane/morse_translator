@@ -17,7 +17,7 @@ struct morse_array_t {
 struct morse_array_t* morse_array_new();
 void morse_array_delete(struct morse_array_t** ma_ptr);
 
-void morse_array_set(struct morse_array_t* ma, 
+void morse_array_insert(struct morse_array_t* ma, 
 		const int c, const char *morse); 
 const char* morse_array_get(struct morse_array_t* ma, const int c);
 

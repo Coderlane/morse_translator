@@ -54,7 +54,7 @@ morse_array_delete(struct morse_array_t** ma_ptr)
  * @param morse
  */
 void 
-morse_array_set(struct morse_array_t* ma, 
+morse_array_insert(struct morse_array_t* ma, 
 		const int c, const char *morse)
 {
 	assert(ma != NULL);

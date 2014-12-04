@@ -41,33 +41,6 @@ morse_tree_delete(struct morse_tree_t** mt_ptr)
  * @brief 
  *
  * @param mt
- * @param filename
- */
-void 
-morse_tree_load(struct morse_tree_t* mt, const char* filename)
-{
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	FILE *file;
-	
-	assert(filename != NULL);
-	file = fopen(filename, "r");
-
-	while((read = getline(&line, &len, file)) != -1) {
-		line[read - 1] = '\0';
-		morse_tree_insert(mt, line[0], &line[2]);
-	}
-	if(line != NULL) 
-		free(line);
-
-	fclose(file);
-}
-
-/**
- * @brief 
- *
- * @param mt
  * @param c
  * @param morse
  */
@@ -75,7 +48,7 @@ void
 morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 {
 	int len = strlen(morse);
-	printf("%c:%s\n", c, morse);
+//	printf("%c:%s\n", c, morse);
 	if(len == 1) {
 		if(morse[0] == '.') {
 			mt->mt_dit->mtn_char = c;

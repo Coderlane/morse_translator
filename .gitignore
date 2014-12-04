@@ -13,3 +13,7 @@ install_manifest.txt
 
 # VIM
 .*.sw*
+
+# YCM
+.*.py
+.*.pyc

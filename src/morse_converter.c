@@ -54,7 +54,7 @@ morse_converter_load(struct morse_converter_t* mc, const char* filename)
 
 
 char 
-morse_converter_get_char(struct morse_converter_t* mc, const char* morse)
+morse_converter_get_ascii(struct morse_converter_t* mc, const char* morse)
 {
 	return morse_tree_get(mc->mc_tree, morse);
 }
@@ -63,4 +63,89 @@ const char*
 morse_converter_get_morse(struct morse_converter_t* mc, char c)
 {
 	return morse_array_get(mc->mc_arr, c);
+}
+
+void 
+morse_converter_to_morse(struct morse_converter_t* mc, 
+		const char* input_filename, const char* output_filename)
+{
+	FILE *infile = NULL;
+	FILE *outfile = NULL;
+
+	infile = fopen(input_filename, "r");
+	if(infile == NULL) {
+		perror("Failed to open input file.");
+		goto out;
+	}
+
+	outfile = fopen(output_filename, "w");
+	if(outfile == NULL) {
+		perror("Failed to open output file.");
+		goto out;
+	}
+
+	while(!feof(infile)) {
+		int ascii = fgetc(infile);
+		if(ascii == EOF) {
+			break;
+		} else if(ascii == '\n' || ascii == '\r') {
+			fputc(ascii, outfile);
+		} else {
+			const char *morse = morse_converter_get_morse(mc, ascii);
+			printf("%c:%d:%s\n", ascii, ascii, morse);
+			fputs(morse, outfile);
+		 	fputc(' ', outfile);	
+		}
+	}
+
+out:
+	if(infile != NULL) {
+		fclose(infile);
+	}
+	if(outfile != NULL) {
+		fclose(outfile);
+	}
+}
+
+void morse_converter_to_ascii(struct morse_converter_t* mc, 
+		const char* input_filename, const char* output_filename)
+{
+	FILE *in = NULL;
+	FILE *out = NULL;
+	char morse_arr[8];
+	int morse_tail = 0;
+
+	in = fopen(input_filename, "r");
+	if(in == NULL) {
+		perror("Failed to open input file.");
+		goto out;
+	}
+
+	out = fopen(output_filename, "w");
+	if(out == NULL) {
+		perror("Failed to open output file.");
+		goto out;
+	}
+
+	while(!feof(in)) {
+		char morse = fgetc(in);
+		if(morse == '\n' || morse == '\r') {
+			fputc(morse, out);
+		} else if(morse == ' ' && morse_tail != 0) {
+			morse_arr[morse_tail] = '\0';
+			char ascii = morse_converter_get_ascii(mc, morse_arr);
+			fputc(ascii, out);
+		} else {
+			morse_arr[morse_tail] = morse;
+			morse_tail++;
+		}
+	}
+
+out:
+	if(in != NULL) {
+		fclose(in);
+	}
+	if(out != NULL) {
+		fclose(out);
+	}
 }

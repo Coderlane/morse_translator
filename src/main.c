@@ -18,11 +18,12 @@ main(int argc, char **argv)
 	char output_filename[1024];
 	struct morse_converter_t *mc;
  
-	assert(argc >= 2);
+	assert(argc == 2 || argc == 5);
 	
 	mc = morse_converter_new();
 	morse_converter_load(mc, argv[1]);
-
+	
+	if(argc == 2) {
 	while((choice = menu()) != EXIT_CHOICE) 
 	{
 
@@ -38,7 +39,16 @@ main(int argc, char **argv)
 			morse_converter_to_ascii(mc, input_filename, output_filename);
 		}
 	}
-
+	} else {
+		if(strcmp(argv[2], "m") == 0) {
+			morse_converter_to_morse(mc, argv[3], argv[4]);
+		} else if(strcmp(argv[2], "a") == 0) {
+			morse_converter_to_ascii(mc, argv[3], argv[4]);
+		} else {
+			fprintf(stderr, "Please choose m or a.\n");
+			exit(-1);
+		}
+	}
 	morse_converter_delete(&mc);
 	return 0;
 }

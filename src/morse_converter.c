@@ -78,26 +78,26 @@ morse_converter_to_morse(struct morse_converter_t* mc,
 		goto out;
 	}
 
-	outfile = fopen(output_filename, "w");
+	outfile = fopen(output_filename, "wb");
 	if(outfile == NULL) {
 		perror("Failed to open output file.");
 		goto out;
 	}
+	setbuf(outfile, NULL);
 
 	while(!feof(infile)) {
 		int ascii = fgetc(infile);
 		if(ascii == EOF) {
 			break;
-		} else if(ascii == '\n' || ascii == '\r') {
-			fputc(ascii, outfile);
-		} else {
+		} else if(ascii == '\n') {
+			fputs("\n", outfile);
+		} else if(ascii != '\r'){
 			const char *morse = morse_converter_get_morse(mc, ascii);
-			printf("%c:%d:%s\n", ascii, ascii, morse);
 			fputs(morse, outfile);
-		 	fputc(' ', outfile);	
+			putc(' ', outfile);
 		}
 	}
-
+	
 out:
 	if(infile != NULL) {
 		fclose(infile);

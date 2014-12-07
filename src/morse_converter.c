@@ -42,7 +42,7 @@ morse_converter_load(struct morse_converter_t* mc, const char* filename)
 	file = fopen(filename, "r");
 
 	while((read = getline(&line, &len, file)) != -1) {
-		line[read - 1] = '\0';
+		line[read - 2] = '\0'; // nuke \r\n
 		morse_tree_insert(mc->mc_tree, line[0], &line[2]);
 		morse_array_insert(mc->mc_arr, line[0], &line[2]);
 	}
@@ -65,6 +65,13 @@ morse_converter_get_morse(struct morse_converter_t* mc, char c)
 	return morse_array_get(mc->mc_arr, c);
 }
 
+/**
+ * @brief Read a file and write the morse output to another file.
+ *
+ * @param mc 
+ * @param input_filename
+ * @param output_filename
+ */
 void 
 morse_converter_to_morse(struct morse_converter_t* mc, 
 		const char* input_filename, const char* output_filename)
@@ -79,21 +86,23 @@ morse_converter_to_morse(struct morse_converter_t* mc,
 		goto out;
 	}
 
-	outfile = fopen(output_filename, "wb");
+	outfile = fopen(output_filename, "w");
 	if(outfile == NULL) {
 		perror("Failed to open output file.");
 		goto out;
 	}
-	setbuf(outfile, NULL);
+	//setbuf(outfile, NULL);
 
 	while((ascii = fgetc(infile)) != EOF) {
 		if(ascii == '\n') {
 			fputs("\n", outfile);
 		} else {
 			const char *morse = morse_converter_get_morse(mc, ascii);
-			// fprintf doesn't work..?
-			fputs(morse, outfile);
-			putc(' ', outfile);
+			if(morse == '\0') {
+				fprintf(stderr, "Warning: Unmapped character: %c:%d\n", ascii, ascii);
+			} else {
+				fprintf(outfile, "%s ", morse);
+			}
 		}
 	}
 	

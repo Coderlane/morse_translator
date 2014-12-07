@@ -69,6 +69,7 @@ void
 morse_converter_to_morse(struct morse_converter_t* mc, 
 		const char* input_filename, const char* output_filename)
 {
+	int ascii;
 	FILE *infile = NULL;
 	FILE *outfile = NULL;
 
@@ -85,14 +86,12 @@ morse_converter_to_morse(struct morse_converter_t* mc,
 	}
 	setbuf(outfile, NULL);
 
-	while(!feof(infile)) {
-		int ascii = fgetc(infile);
-		if(ascii == EOF) {
-			break;
-		} else if(ascii == '\n') {
+	while((ascii = fgetc(infile)) != EOF) {
+		if(ascii == '\n') {
 			fputs("\n", outfile);
-		} else if(ascii != '\r'){
+		} else {
 			const char *morse = morse_converter_get_morse(mc, ascii);
+			// fprintf doesn't work..?
 			fputs(morse, outfile);
 			putc(' ', outfile);
 		}

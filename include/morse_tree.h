@@ -32,4 +32,5 @@ struct morse_tree_node_t* morse_tree_node_new();
 void morse_tree_node_delete(struct morse_tree_node_t** mtn_ptr);
 
 char morse_tree_node_get(struct morse_tree_node_t *mtn);
+void morse_tree_node_set(struct morse_tree_node_t *mtn, char c);
 #endif

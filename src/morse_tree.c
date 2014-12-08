@@ -9,7 +9,7 @@
  *
  * @return 
  */
-struct morse_tree_t* 
+	struct morse_tree_t* 
 morse_tree_new()
 {
 	struct morse_tree_t *mt = malloc(sizeof(struct morse_tree_t));
@@ -23,7 +23,7 @@ morse_tree_new()
  *
  * @param mt_ptr
  */
-void 
+	void 
 morse_tree_delete(struct morse_tree_t** mt_ptr)
 {
 	struct morse_tree_t* mt;
@@ -47,48 +47,51 @@ morse_tree_delete(struct morse_tree_t** mt_ptr)
  * @param c
  * @param morse
  */
-void 
+	void 
 morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 {
-	int len = strlen(morse);
-//	printf("%c:%s\n", c, morse);
+	struct morse_tree_node_t* mtn_cur;
+	struct morse_tree_node_t* mtn_nxt;
+	int len;
+
+	len	= strlen(morse);
+	printf("%d:%c:%s\n", len, c, morse);
 	if(len == 1) {
 		if(morse[0] == '.') {
-			mt->mt_dit->mtn_char = c;
-			mt->mt_dit->mtn_init = 1;
+			printf("insert: %c at root dit\n", c);
+			morse_tree_node_set(mt->mt_dit, c);
+			return;
 		} else {
-			mt->mt_dah->mtn_char = c;
-			mt->mt_dah->mtn_init = 1;
+			printf("insert: %c at root dah\n", c);
+			morse_tree_node_set(mt->mt_dah, c);
+			return;
 		}
-	} else {
-		struct morse_tree_node_t* mtn_cur;
-		struct morse_tree_node_t* mtn_nxt;
-
-		if(morse[0] == '.') {
-			mtn_cur = mt->mt_dit;	
-		} else {
-			mtn_cur = mt->mt_dah;
-		}
-
-		for(int i = 1; i < len; i++) {
-			if(morse[i] == '.' ) {
-				mtn_nxt = mtn_cur->mtn_dit;
-				if(mtn_nxt == NULL) {
-					mtn_nxt = morse_tree_node_new();
-					mtn_cur->mtn_dit = mtn_nxt;
-				}
-			} else {
-				mtn_nxt = mtn_cur->mtn_dah;
-				if(mtn_nxt == NULL) {
-					mtn_nxt = morse_tree_node_new();
-					mtn_cur->mtn_dah = mtn_nxt;
-				}
-			}
-			mtn_cur = mtn_nxt;
-		}
-		mtn_cur->mtn_init = 1;
-		mtn_cur->mtn_char = c;
 	}
+
+
+	if(morse[0] == '.') {
+		mtn_cur = mt->mt_dit;	
+	} else {
+		mtn_cur = mt->mt_dah;
+	}
+
+	for(int i = 1; i <= len; i++) {
+		if(morse[i] == '.' ) {
+			mtn_nxt = mtn_cur->mtn_dit;
+			if(mtn_nxt == NULL) {
+				mtn_nxt = morse_tree_node_new();
+				mtn_cur->mtn_dit = mtn_nxt;
+			}
+		} else {
+			mtn_nxt = mtn_cur->mtn_dah;
+			if(mtn_nxt == NULL) {
+				mtn_nxt = morse_tree_node_new();
+				mtn_cur->mtn_dah = mtn_nxt;
+			}
+		}
+		mtn_cur = mtn_nxt;
+	}
+	morse_tree_node_set(mtn_cur, c);
 }
 
 /**
@@ -99,40 +102,43 @@ morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
  *
  * @return 
  */
-char 
+	char 
 morse_tree_get(struct morse_tree_t* mt, const char* morse)
 {
-	int len = strlen(morse);
+	struct morse_tree_node_t* mtn_cur;
+	struct morse_tree_node_t* mtn_nxt;
+	int len;
 
+	len	= strlen(morse);
 	if(len == 1) {
 		if(morse[0] == '.') {
 			return morse_tree_node_get(mt->mt_dit);
 		} else {
 			return morse_tree_node_get(mt->mt_dah);
 		}
-	} else {
-		struct morse_tree_node_t* mtn_cur;
-		struct morse_tree_node_t* mtn_nxt;
-
-		if(morse[0] == '.') {
-			mtn_cur = mt->mt_dit;	
-		} else {
-			mtn_cur = mt->mt_dah;
-		}
-
-		for(int i = 1; i <= len; i++) {
-			if(mtn_cur == NULL) {
-				return '\0';
-			}
-			if(morse[i] == '.' ) {
-				mtn_nxt = mtn_cur->mtn_dit;
-			} else {
-				mtn_nxt = mtn_cur->mtn_dah;
-			}
-			mtn_cur = mtn_nxt;
-		}
-		return morse_tree_node_get(mtn_cur);
 	}
+
+	if(morse[0] == '.') {
+		mtn_cur = mt->mt_dit;	
+	} else {
+		mtn_cur = mt->mt_dah;
+	}
+
+	for(int i = 1; i <= len; i++) {
+		if(mtn_cur == NULL) {
+			return '\0';
+		}
+		if(morse[i] == '.' ) {
+			mtn_nxt = mtn_cur->mtn_dit;
+		} else {
+			mtn_nxt = mtn_cur->mtn_dah;
+		}
+		mtn_cur = mtn_nxt;
+	}
+	if(mtn_cur == NULL) {
+		return '\0';
+	}
+	return morse_tree_node_get(mtn_cur);
 }
 
 /**
@@ -140,7 +146,7 @@ morse_tree_get(struct morse_tree_t* mt, const char* morse)
  *
  * @return 
  */
-struct morse_tree_node_t* 
+	struct morse_tree_node_t* 
 morse_tree_node_new()
 {
 	struct morse_tree_node_t *mtn = calloc(sizeof(struct morse_tree_node_t), 1);
@@ -152,7 +158,7 @@ morse_tree_node_new()
  *
  * @param mtn_ptr
  */
-void
+	void
 morse_tree_node_delete(struct morse_tree_node_t** mtn_ptr)
 {
 	struct morse_tree_node_t* mtn;
@@ -176,7 +182,7 @@ morse_tree_node_delete(struct morse_tree_node_t** mtn_ptr)
 	*mtn_ptr = NULL;
 }
 
-char 
+	char 
 morse_tree_node_get(struct morse_tree_node_t* mtn)
 {
 	assert(mtn != NULL);
@@ -185,4 +191,12 @@ morse_tree_node_get(struct morse_tree_node_t* mtn)
 	} else {
 		return '\0';
 	}
+}
+
+	void
+morse_tree_node_set(struct morse_tree_node_t* mtn, char c)
+{
+	assert(mtn != NULL);
+	mtn->mtn_init = 1; 
+	mtn->mtn_char = c;
 }

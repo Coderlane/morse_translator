@@ -3,8 +3,11 @@
 #ifndef MORSE_CONVERTER_H
 #define MORSE_CONVERTER_H
 
+#define MC_LINE_LEN 2048
+
 #include <morse_tree.h>
 #include <morse_array.h>
+#include <string_manip.h>
 
 struct morse_converter_t {
 	struct morse_tree_t* mc_tree;

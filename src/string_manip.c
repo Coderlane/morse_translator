@@ -1,3 +1,15 @@
+/**
+ * @file string_manip.c
+ * @brief 
+ * @author Travis Lane
+ * @version 1.0
+ * @date 2014-12-08
+ */
+
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 #include <string_manip.h>
 

@@ -1,12 +1,14 @@
+/**
+ * @file string_manip.h
+ * @brief 
+ * @author Travis Lane
+ * @version 1.0
+ * @date 2014-12-08
+ */
 
 
 #ifndef STRING_MANIP_H
 #define STRING_MANIP_H
-
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 
 void trim(char* str);
 void ltrim(char* str);

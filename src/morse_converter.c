@@ -1,6 +1,12 @@
+/**
+ * @file morse_converter.c
+ * @brief 
+ * @author Travis Lane
+ * @version 1.0
+ * @date 2014-12-08
+ */
 
-
-#include <morse_converter.h>
+#include <morse_converter_internal.h>
 
 /**
  * @brief Creates a new morse converter.
@@ -59,14 +65,39 @@ morse_converter_load(struct morse_converter_t* mc, const char* filename)
 	}
 
 	while(!feof(keyfile)) {
-		char line[MC_LINE_LEN];
-		char *result;
-		result = fgets(line, sizeof(line), keyfile);
-		if(result != NULL) {
-			trim(line);
-			morse_tree_insert(mc->mc_tree, line[0], &line[2]);
-			morse_array_insert(mc->mc_arr, line[0], &line[2]);
+		char chunk[MC_MAP_CHUNK_LEN], ascii;
+		char *morse, *result;
+		// Get a chunk.
+
+		if((result = fgets(chunk, sizeof(chunk), keyfile)) == NULL) {
+			// Probably at EOF.
+			continue;
 		}
+
+		trim(chunk);
+		if(chunk[0] == '#') {
+			//comment line
+			continue;
+		}
+
+		ascii = chunk[0];
+		// Find the seperator
+		morse = strchr(chunk, ',');
+		if(morse == NULL) {
+			// No seperator...?
+			continue;
+		}
+
+		morse++;
+		trim(morse);
+		if(strlen(morse) == 0) {
+			// No morse sequence...?
+			continue;
+		}
+
+		// Add items to data structures.
+		morse_tree_insert(mc->mc_tree, ascii, morse);
+		morse_array_insert(mc->mc_arr, ascii, morse);
 	}
 
 out:
@@ -80,9 +111,9 @@ out:
  * @param mc The morse converter.
  * @param morse The morse sequence.
  *
- * @return A character or the null character.
+ * @return A character or -1.
  */
-char 
+int 
 morse_converter_get_ascii(struct morse_converter_t* mc, const char* morse)
 {
 	return morse_tree_get(mc->mc_tree, morse);
@@ -114,8 +145,8 @@ morse_converter_to_morse(struct morse_converter_t* mc,
 		const char* input_filename, const char* output_filename)
 {
 	int ascii;
-	FILE *infile = NULL;
-	FILE *outfile = NULL;
+	FILE* infile = NULL;
+	FILE* outfile = NULL;
 
 	infile = fopen(input_filename, "r");
 	if(infile == NULL) {
@@ -137,7 +168,7 @@ morse_converter_to_morse(struct morse_converter_t* mc,
 			fprintf(outfile, " ");
 		} else {
 			const char *morse = morse_converter_get_morse(mc, ascii);
-			if(morse == '\0') {
+			if(morse == NULL) {
 				fprintf(stderr, "Warning: Unmapped "
 						"character: %c:%d\n", ascii, ascii);
 			} else {
@@ -167,9 +198,9 @@ void
 morse_converter_to_ascii(struct morse_converter_t* mc, 
 		const char* input_filename, const char* output_filename)
 {
-	FILE *infile = NULL;
-	FILE *outfile = NULL;
-	char morse_arr[8];
+	FILE* infile = NULL;
+	FILE* outfile = NULL;
+	char morse_arr[MC_MORSE_CHUNK_LEN];
 	int morse_tail = 0;
 
 	infile = fopen(input_filename, "r");
@@ -187,26 +218,33 @@ morse_converter_to_ascii(struct morse_converter_t* mc,
 	while(!feof(infile)) {
 		char morse = fgetc(infile);
 		if(morse != ' ' && isspace(morse)) {
-			// Just write whitespace characters.
+			// Just write whitespace characters, except space.
 			fputc(morse, outfile);
 		} else if(morse == ' ') {
 			if(morse_tail != 0) {
-					char ascii;	
-					morse_arr[morse_tail] = '\0';
-					ascii = morse_converter_get_ascii(mc, morse_arr);
-					if (ascii == '\0') {
-						fprintf(stderr, "Warning unmapped "
-								"morse sequence: %s\n", morse_arr);
-					} else {
-						fputc(ascii, outfile);
-					}
-					morse_tail = 0;
+				// Done with a morse sequence.
+				int ascii;	
+				morse_arr[morse_tail] = '\0';
+				ascii = morse_converter_get_ascii(mc, morse_arr);
+				if (ascii < 0) {
+					fprintf(stderr, "Warning unmapped "
+							"morse sequence: %s\n", morse_arr);
 				} else {
-					fputc(' ', outfile);
+					fputc(ascii, outfile);
 				}
+				morse_tail = 0;
 			} else {
+				// Just finding spaces.
+				fputc(' ', outfile);
+			}
+		} else {
+			// Add character to buffer.
 			morse_arr[morse_tail] = morse;
 			morse_tail++;
+			if(morse_tail >= MC_MORSE_CHUNK_LEN) {
+				fprintf(stderr, "Morse chunk too long!\n");
+				exit(-1);
+			}
 		}
 	}
 

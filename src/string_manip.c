@@ -42,3 +42,40 @@ void rtrim(char* str)
 	for(i = len ; i > 0 && isspace(str[i - 1]); i--);
 	str[i] = '\0';
 }
+
+/**
+ * @brief Checks to see if a string is a morse string.
+ *
+ * @param str The string to check.
+ *
+ * @return 1 if it is a morse string, else 0.
+ */
+int
+ismorsestr(const char* str) 
+{
+	while(*str != '\0') {
+		if(!ismorse(*str))
+			return 0;	
+		str++;
+	}
+	return 1;
+}
+
+/**
+ * @brief Checks to see if a character is a morse character.
+ *
+ * @param c The character to check.
+ *
+ * @return 1 if it is a morse character, else 0.
+ */
+int
+ismorse(const char c)
+{
+	switch(c) {
+		case '-':
+		case '.':
+			return 1;
+		default:
+			return 0;
+	}
+}

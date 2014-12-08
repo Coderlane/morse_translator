@@ -52,7 +52,7 @@ morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 {
 	struct morse_tree_node_t* mtn_cur;
 	struct morse_tree_node_t* mtn_nxt;
-	int len;
+	int len, i;
 
 	len	= strlen(morse);
 	printf("%d:%c:%s\n", len, c, morse);
@@ -75,7 +75,7 @@ morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 		mtn_cur = mt->mt_dah;
 	}
 
-	for(int i = 1; i <= len; i++) {
+	for(i = 1; i <= len; i++) {
 		if(morse[i] == '.' ) {
 			mtn_nxt = mtn_cur->mtn_dit;
 			if(mtn_nxt == NULL) {
@@ -107,7 +107,7 @@ morse_tree_get(struct morse_tree_t* mt, const char* morse)
 {
 	struct morse_tree_node_t* mtn_cur;
 	struct morse_tree_node_t* mtn_nxt;
-	int len;
+	int len, i;
 
 	len	= strlen(morse);
 	if(len == 1) {
@@ -124,7 +124,7 @@ morse_tree_get(struct morse_tree_t* mt, const char* morse)
 		mtn_cur = mt->mt_dah;
 	}
 
-	for(int i = 1; i <= len; i++) {
+	for(i = 1; i <= len; i++) {
 		if(mtn_cur == NULL) {
 			return '\0';
 		}

@@ -49,7 +49,6 @@ morse_converter_delete(struct morse_converter_t** mc_ptr)
 void 
 morse_converter_load(struct morse_converter_t* mc, const char* filename)
 {
-
 	FILE* keyfile = NULL;
 
 	assert(filename != NULL);
@@ -139,7 +138,8 @@ morse_converter_to_morse(struct morse_converter_t* mc,
 		} else {
 			const char *morse = morse_converter_get_morse(mc, ascii);
 			if(morse == '\0') {
-				fprintf(stderr, "Warning: Unmapped character: %c:%d\n", ascii, ascii);
+				fprintf(stderr, "Warning: Unmapped "
+						"character: %c:%d\n", ascii, ascii);
 			} else {
 				fprintf(outfile, "%s ", morse);
 			}
@@ -186,14 +186,18 @@ morse_converter_to_ascii(struct morse_converter_t* mc,
 
 	while(!feof(infile)) {
 		char morse = fgetc(infile);
-		if(morse == '\n' || morse == '\r') {
+		if(morse != ' ' && isspace(morse)) {
+			// Just write whitespace characters.
 			fputc(morse, outfile);
 		} else if(morse == ' ') {
 			if(morse_tail != 0) {
+					char ascii;	
 					morse_arr[morse_tail] = '\0';
-					char ascii = morse_converter_get_ascii(mc, morse_arr);
-					printf("%s:%c\n", morse_arr, ascii);
-					if (ascii != '\0') {
+					ascii = morse_converter_get_ascii(mc, morse_arr);
+					if (ascii == '\0') {
+						fprintf(stderr, "Warning unmapped "
+								"morse sequence: %s\n", morse_arr);
+					} else {
 						fputc(ascii, outfile);
 					}
 					morse_tail = 0;

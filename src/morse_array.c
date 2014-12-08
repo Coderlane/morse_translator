@@ -27,13 +27,15 @@ void
 morse_array_delete(struct morse_array_t** ma_ptr)
 {
 	struct morse_array_t* ma;
+	int i;
+
 	assert(ma_ptr != NULL);
 	
 	ma = *ma_ptr;
 	if(ma == NULL)
 		return;
 
-	for(int i = 0; i < MORSE_ARRAY_LEN; i++) {
+	for(i = 0; i < MORSE_ARRAY_LEN; i++) {
 		if(ma->ma_arr[i] != NULL) {
 			free(ma->ma_arr[i]);
 			ma->ma_arr[i] = NULL;

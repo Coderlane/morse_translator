@@ -61,30 +61,37 @@ morse_array_delete(struct morse_array_t** ma_ptr)
  * @param c The character to map the sequence to.
  * @param morse The morse sequence.
  */
-void 
+int 
 morse_array_insert(struct morse_array_t* ma, 
 		const int c, const char *morse)
 {
+	int status = MAS_OK;
 	assert(ma != NULL);
 	assert(morse != NULL);
+
 	if(c < 0 || c > MORSE_ARRAY_LEN) {
 		// Out of bounds, should this be an error?
 		fprintf(stderr, "Error, inserting character "
 				"out of bounds: Character %c:%d\n", c, c);
-		return;
+		return MAS_EBOUNDS;
 	}
+
 	if(!ismorsestr(morse)) {
 		fprintf(stderr, "Attempted to insert a non-morse "
 				"string to the morse array. String: %s\n", morse);
-		return;
+		return MAS_ENON_MORSE;
 	}
 	
 	if(ma->ma_arr[c] != NULL) {
 		// Should this be an error?
 		free(ma->ma_arr[c]);
+		status = MAS_WARN;
 	}
+
 	ma->ma_arr[c] = strdup(morse);
 	assert(ma->ma_arr[c] != NULL);
+
+	return status;
 }
 
 /**

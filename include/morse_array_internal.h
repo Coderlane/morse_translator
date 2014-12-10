@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <string_manip.h>
+#include <morse_array.h>
 
 /**
  * @brief Number of elements in the morse array.

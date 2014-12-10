@@ -51,20 +51,22 @@ morse_tree_delete(struct morse_tree_t** mt_ptr)
  * @param c The character to insert.
  * @param morse The morse sequence to map to. (only - or .)
  */
-void
+int
 morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 {
-	int len;
+	int len, result = MTS_OK;
 
-	assert(ismorsestr(morse));
+	if(!ismorsestr(morse)) {
+		return MTS_ENON_MORSE;
+	}
 
 	len	= strlen(morse);
 	if(len == 1) {
 		// Check root case.
 		if(morse[0] == '.') {
-			morse_tree_node_set(mt->mt_dit, c);
+			result = morse_tree_node_set(mt->mt_dit, c);
 		} else {
-			morse_tree_node_set(mt->mt_dah, c);
+			result = morse_tree_node_set(mt->mt_dah, c);
 		}
 	} else {
 		struct morse_tree_node_t* mtn_cur;
@@ -100,8 +102,9 @@ morse_tree_insert(struct morse_tree_t *mt, char c, const char* morse)
 			mtn_cur = mtn_nxt;
 		}
 		// Found our spot, set the node.
-		morse_tree_node_set(mtn_cur, c);
+		result = morse_tree_node_set(mtn_cur, c);
 	}
+	return result;
 }
 
 /**
@@ -119,7 +122,9 @@ morse_tree_get(struct morse_tree_t* mt, const char* morse)
 	struct morse_tree_node_t* mtn_nxt;
 	int len, i;
 
-	assert(ismorsestr(morse));
+	if(!ismorsestr(morse)) {
+		return MTS_ENON_MORSE;
+	}
 
 	len	= strlen(morse);
 	if(len == 1) {
@@ -142,7 +147,7 @@ morse_tree_get(struct morse_tree_t* mt, const char* morse)
 	for(i = 1; i <= len; i++) {
 		if(mtn_cur == NULL) {
 			// Node couldn't have been created yet!
-			return -1;
+			return MTS_ENOT_INIT;
 		}
 		// Keep looking.
 		if(morse[i] == '.' ) {
@@ -155,7 +160,7 @@ morse_tree_get(struct morse_tree_t* mt, const char* morse)
 
 	if(mtn_cur == NULL) {
 		// Target node not created yet.
-		return -1;
+		return MTS_ENOT_INIT;
 	}
 	return morse_tree_node_get(mtn_cur);
 }
@@ -215,7 +220,7 @@ morse_tree_node_get(struct morse_tree_node_t* mtn)
 	if(mtn->mtn_init == 1) {
 		return mtn->mtn_char;
 	} else {
-		return -1;
+		return MTS_ENOT_INIT;
 	}
 }
 
@@ -225,10 +230,18 @@ morse_tree_node_get(struct morse_tree_node_t* mtn)
  * @param mtn The node to set.
  * @param c The character to set.
  */
-void
+int
 morse_tree_node_set(struct morse_tree_node_t* mtn, char c)
 {
+	int result = MTS_OK;
 	assert(mtn != NULL);
+	
+	if(mtn->mtn_init) {
+		result = MTS_WARN;
+	}
+
 	mtn->mtn_init = 1; 
 	mtn->mtn_char = c;
+
+	return result;
 }

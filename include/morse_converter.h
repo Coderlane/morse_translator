@@ -1,4 +1,10 @@
-
+/**
+ * @file morse_converter.h
+ * @brief 
+ * @author Travis Lane
+ * @version 1.0
+ * @date 2014-12-10
+ */
 
 #ifndef MORSE_CONVERTER_H
 #define MORSE_CONVERTER_H

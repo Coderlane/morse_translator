@@ -106,9 +106,11 @@ const char*
 morse_array_get(struct morse_array_t* ma, const int c)
 {
 	assert(ma != NULL);
+
 	if(c < 0 || c > MORSE_ARRAY_LEN) {
 		// Out of bounds, should this be an error?
 		return NULL;
 	}
+	
 	return ma->ma_arr[c]; // COULD BE NULL.
 }

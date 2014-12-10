@@ -27,6 +27,8 @@
 
 #include <morse_array.h>
 #include <morse_tree.h>
+#include <morse_converter.h>
+
 #include <string_manip.h>
 
 struct morse_converter_t {
